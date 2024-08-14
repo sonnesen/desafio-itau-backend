@@ -1,0 +1,137 @@
+openapi: "3.0.3"
+info:
+  title: Transactions API
+  description: API to manage transactions
+  version: "1.0"
+servers:
+  - url: http://localhost:8080
+    description: Local server
+tags:
+  - name: Transactions
+    description: Transactions operations
+  - name: Statistics
+    description: Statistics operations
+paths:
+  /transacao:
+    # retrieve all transactions paginated
+    get:
+      operationId: getAllTransactions
+      summary: Retrieve all transactions
+      tags:
+        - Transactions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransactionResponse"
+
+    post:
+      operationId: createTransaction
+      summary: Create a new transaction
+      tags:
+        - Transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionRequest"
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+        "422":
+          description: Unprocessable Entity
+    delete:
+      operationId: deleteTransactions
+      summary: Delete all transactions
+      tags:
+        - Transactions
+      responses:
+        "204":
+          description: No Content
+  /estatistica:
+    get:
+      operationId: getStatistics
+      summary: Retrieve transaction statistics
+      tags:
+        - Statistics
+      parameters:
+        - name: seconds
+          in: query
+          description: Seconds to consider in statistics
+          required: false
+          schema:
+            type: integer
+            format: int32
+            example: 120
+            minimum: 60
+            maximum: 86400
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatisticResponse"
+
+components:
+  schemas:
+    TransactionResponse:
+      type: object
+      properties:
+        valor:
+          type: number
+          example: 100.0
+          description: Transaction value
+          minimum: 0.0
+        dataHora:
+          type: string
+          format: date-time
+          example: "2024-04-14T21:23:00.789+01:00"
+          description: Transaction date and time
+
+    TransactionRequest:
+      type: object
+      required:
+        - valor
+        - dataHora
+      properties:
+        valor:
+          type: number
+          example: 100.0
+          description: Transaction value
+          minimum: 0.0
+        dataHora:
+          type: string
+          format: date-time
+          example: "2024-04-14T21:23:00.789+01:00"
+          description: Transaction date and time
+    StatisticResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int64
+          example: 10
+          description: Transactions count
+        sum:
+          type: number
+          example: 1000.0
+          description: Transactions sum
+        avg:
+          type: number
+          example: 100.0
+          description: Transactions average
+        min:
+          type: number
+          example: 50.0
+          description: Smallest transaction value
+        max:
+          type: number
+          example: 150.0
+          description: Largest transaction value
